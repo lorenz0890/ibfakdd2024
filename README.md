@@ -1,12 +1,12 @@
 # Attacking Graph Neural Networks with Bit Flips: Weisfeiler and Leman Go Indifferent
 
 ## Installation
-1) The IBFA bitflip attack is seamlessly integrated in the PyQ quantization package. Hence for installation, navigate to ibfa/pyq and follow the steps documented in README.md to install PyQ.
+1) The Injectivity Bitflip Attack (IBFA) bitflip attack is seamlessly integrated in the PyQ quantization package. Hence for installation, navigate to ibfa/pyq and follow the steps documented in README.md to install PyQ.
 
 2) After installing PyQ, new quantized models can be trained by running any of the scripts found in ibfa/pyq/graph. Make sure to adapt the paths in the script to your local environment. 
 For a quick start, pre-trained quantized models can be downloaded [here](https://ucloud.univie.ac.at/index.php/s/aY5e3b6Jdyy5HTa).
 
-3) Put the trained models either in ibfa/models or navigate to ibfa/pyq/run_bfa_{model}_{dataset}.py and adapt the paths to your local environment. They should in point to the locations where the quantized models produced in step 2. are stored.
+3) Put the quantized models produced in the previous step either in ibfa/models or navigate to ibfa/pyq/run_bfa_{model}_{dataset}.py and adapt the paths to your local environment. They should in point to the locations where the quantized models produced in step 2. are stored.
 
 ## Execution 
 From the root directory of the repository (ibfa), run
@@ -46,3 +46,4 @@ Example output:
     Pre and post attack average metric, bitflips, failures 0.7062477065992006 0.4733859286583364 10.0 0
     End time 03/06/2024, 13:26:47
 
+Our implementation of IBFA is based on the code of the original [Progressive Bitflip Attack](https://github.com/elliothe/Neural_Network_Weight_Attack)
