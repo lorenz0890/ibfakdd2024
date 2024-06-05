@@ -16,9 +16,9 @@ from pyq.fia.bfa.utils import _WrappedGraphDataset, evaluate_cora
 
 def setup_net(dataset_name):
     if dataset_name == 'Cora':
-        net = torch.load("/media/lorenz/Volume/code/pyq_main/pyq/app/graph/pyq_model_gin_cora.pth")['Model']
+        net = torch.load("./models/pyq_model_gin_cora.pth")['Model']
     elif dataset_name == 'PubMed':
-        net = torch.load("/media/lorenz/Volume/code/pyq_main/pyq/app/graph/pyq_model_gin_pubmed.pth")['Model']
+        net = torch.load("./models/pyq_model_gin_pubmed.pth")['Model']
     net.eval()
     return net
 

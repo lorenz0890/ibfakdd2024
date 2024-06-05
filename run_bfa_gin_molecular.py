@@ -41,23 +41,17 @@ def setup_data(dataset_name, batch_size, shuffle=True):
 
 def setup_net(dataset_name):
     if dataset_name == 'ogbg-molpcba':
-        net = torch.load("/media/lorenz/Volume/code/pyq_main/pyq/app/graph/pyq_model_gin_molpcba.pth")['Model']
+        net = torch.load("./models/pyq_model_gin_molpcba.pth")['Model']
     elif dataset_name == 'ogbg-molhiv':
-        net = torch.load("/media/lorenz/Volume/code/pyq_main/pyq/app/graph/pyq_model_gin_molhiv.pth")['Model']
+        net = torch.load("./models/pyq_model_gin_molhiv.pth")['Model']
     elif dataset_name == 'ogbg-moltox21':
-        net = torch.load("/media/lorenz/Volume/code/pyq_main/pyq/app/graph/pyq_model_gin_moltox.pth")['Model']
-    elif dataset_name == 'ogbg-molclintox':
-        net = torch.load("/media/lorenz/Volume/code/pyq_main/pyq/app/graph/pyq_model_gin_molclintox.pth")['Model']
+        net = torch.load("./models/pyq_model_gin_moltox.pth")['Model']
     elif dataset_name == 'ogbg-moltoxcast':
-        net = torch.load("/media/lorenz/Volume/code/pyq_main/pyq/app/graph/pyq_model_gin_moltoxcast.pth")['Model']
+        net = torch.load("./models/pyq_model_gin_moltoxcast.pth")['Model']
     elif dataset_name == 'ogbg-molbace':
-        net = torch.load("/media/lorenz/Volume/code/pyq_main/pyq/app/graph/pyq_model_gin_molbace.pth")['Model']
-    elif dataset_name == 'ogbg-molbbbp':
-        net = torch.load("/media/lorenz/Volume/code/pyq_main/pyq/app/graph/pyq_model_gin_molbbbp.pth")['Model']
-    elif dataset_name == 'ogbg-molsider':
-        net = torch.load("/media/lorenz/Volume/code/pyq_main/pyq/app/graph/pyq_model_gin_molsider.pth")['Model']
+        net = torch.load("./models/pyq_model_gin_molbace.pth")['Model']
     elif dataset_name == 'ogbg-molmuv':
-        net = torch.load("/media/lorenz/Volume/code/pyq_main/pyq/app/graph/pyq_model_gin_molmuv.pth")['Model']
+        net = torch.load("./models/pyq_model_gin_molmuv.pth")['Model']
     net.eval()
     return net
 

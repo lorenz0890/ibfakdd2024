@@ -37,9 +37,9 @@ def setup_data(dataset_name, batch_size, shuffle=True, ibfa_limit=0.01):
 
 def setup_net(dataset_name):
     if dataset_name == 'tu-collab':
-        net = torch.load("/media/lorenz/Volume/code/pyq_main/pyq/app/graph/model_copies/pyq_model_gin_collab.pth")['Model']
+        net = torch.load("./models/pyq_model_gin_collab.pth")['Model']
     if dataset_name == 'tu-gitstar':
-        net = torch.load("/media/lorenz/Volume/code/pyq_main/pyq/app/graph/model_copies/pyq_model_gin_gitstar.pth")['Model']
+        net = torch.load("./models/pyq_model_gin_gitstar.pth")['Model']
     net.eval()
     return net
 

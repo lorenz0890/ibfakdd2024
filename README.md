@@ -3,9 +3,10 @@
 ## Installation
 1) The IBFA bitflip attack is seamlessly integrated in the PyQ quantization package. Hence for installation, navigate to ibfa/pyq and follow the steps documented in README.md to install PyQ.
 
-2) After installing PyQ, new quantized models can be trained by running any of the scripts found in ibfa/pyq/graph. Make sure to adapt the paths in the script to your local environment.
+2) After installing PyQ, new quantized models can be trained by running any of the scripts found in ibfa/pyq/graph. Make sure to adapt the paths in the script to your local environment. 
+For a quick start, pre-trained quantized models can be downloaded [here](https://ucloud.univie.ac.at/index.php/s/aY5e3b6Jdyy5HTa).
 
-3) Navigate to ibfa/pyq/run_bfa_{model}_{dataset}.py and adapt the paths to your local environment. They should point to the locations where the quantized models produced in step 2. are stored.
+3) Put the trained models either in ibfa/models or navigate to ibfa/pyq/run_bfa_{model}_{dataset}.py and adapt the paths to your local environment. They should in point to the locations where the quantized models produced in step 2. are stored.
 
 ## Execution 
 From the root directory of the repository (ibfa), run
