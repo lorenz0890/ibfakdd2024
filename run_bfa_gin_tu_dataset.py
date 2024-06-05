@@ -82,9 +82,9 @@ def validate(model, test_loader):
 
 def main():
     print('asd', flush=True)
-    parser = argparse.ArgumentParser(prog='python run_bfa_gin_molecular.py')
+    parser = argparse.ArgumentParser(prog='python run_bfa_gin_tu_dataset.py')
     parser.add_argument('--type', help='PBFA, RBFA, IBFAv1, IBFAv2', type=str)
-    parser.add_argument('--data', help='ogbg-molpcba, ogbg-molhiv, ogbg-moltox21, ogbg-molclintox, ogbg-moltoxcast, ogbg-molbace', type=str)
+    parser.add_argument('--data', help='tu-gitstar, tu-collab', type=str)
     parser.add_argument('--n', help='Run experiment n times', type=int)
     parser.add_argument('--k', help='Run BFA k times', type=int)
     parser.add_argument('--sz', help='Batch size', type=int)
