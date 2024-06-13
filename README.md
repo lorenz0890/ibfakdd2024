@@ -1,8 +1,6 @@
 # Attacking Graph Neural Networks with Bit Flips: Weisfeiler and Leman Go Indifferent
 
-
-![screenshot](https://github.com/lorenz0890/ibfakdd2024/blob/master/molecule_thumbnail.jpg)
-
+<img src="https://github.com/lorenz0890/ibfakdd2024/blob/master/molecule_thumbnail.jpg" alt="thumbnail" width="300"/>
 
 ## Installation
 1) The Injectivity Bitflip Attack (IBFA) bitflip attack is seamlessly integrated in the PyQ quantization package. Hence for installation, navigate to ibfa/pyq and follow the steps documented in README.md to install PyQ.
