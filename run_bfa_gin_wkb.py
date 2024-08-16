@@ -57,8 +57,6 @@ def main():
     args = parser.parse_args()
     print(args.type, args.data, args.n, args.k, args.sz)
 
-    #attack_type, device = 'PBFA', torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    #experiment_runs, eval_runs, attack_runs, batch_size = 1, 10, 100, 32
     attack_type, dataset_name, device = args.type, args.data, torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     experiment_runs, eval_runs, attack_runs, batch_size = args.n, 10, args.k, args.sz
 
@@ -80,7 +78,7 @@ def main():
         dataset = WebKB(path, dataset, transform=T.NormalizeFeatures())[0]
 
         dataset = dataset.to(device)
-        #dataset.x = dataset.x[:, :10]
+
         if attack_type == 'PBFA':
             with torch.no_grad():
                 max_multiple = (dataset.train_mask.shape[0] - batch_size) // batch_size
@@ -111,7 +109,7 @@ def main():
         net = net.to(device)
 
         print(validate(net, dataset, fold))
-        #exit()
+
         pre_acc.append(validate(net, dataset, fold)[2])
         param_dict = {'Texas' : 10, 'Wisconsin' : 5}
         attacker, attack_log = BFA(criterion, net, param_dict[dataset_name], True), None #10 Texas, 5 Wisconsin - prevents PBFA from being stuck in "random loop of death"
@@ -162,8 +160,7 @@ def main():
             exit(-1)
         ct = datetime.datetime.now()
         experiment_accumulated_seconds += time.time() - start_time
-        #print(pre_acc)
-        #print(post_acc)
+
         print('Current time:', ct.strftime("%d/%m/%Y, %H:%M:%S"),
               'Completed:', (r + 1) / experiment_runs * 100, '%',
               'Duration per experiment:', round(time.time() - start_time, 2), 's',

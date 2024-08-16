@@ -73,7 +73,7 @@ def main():
         net = setup_net(dataset_name).to(device)#copy.deepcopy(net_clean).to(device)
         BFA, criterion = setup_attack(attack_type)
 
-        dataset = dataset_name#"PubMed" # 'Cora
+        dataset = dataset_name #PubMed # Cora
         path = osp.join(osp.dirname(osp.realpath(__file__)), '..', 'data', 'Planetoid')
         dataset = Planetoid(path, dataset, transform=T.NormalizeFeatures())[0]
 
@@ -91,12 +91,7 @@ def main():
                 dataset.train_mask = torch.zeros_like(dataset.train_mask, dtype=torch.bool)
                 dataset.train_mask[selected_indices] = True
 
-                #max_multiple = (dataset.train_mask.shape[0] - batch_size) // batch_size
-                #random_int = random.randint(0, max_multiple)
-                #target1 = random_int * batch_size
-                #target2 = None
-                #print(dataset.train_mask, max_multiple)
-        target1 = None #random_int * batch_size
+        target1 = None 
         target2 = None
         print(dataset.train_mask)
         #exit()
@@ -125,7 +120,7 @@ def main():
                     mask2 = torch.zeros_like(train_mask_orig, dtype=torch.bool)
                     mask2[selected_indices] = True
 
-                    out1 = out1_orig[mask1]#[k:k + batch_size, :]
+                    out1 = out1_orig[mask1]
                     out2 = out2_orig[mask2]
                     if out1.shape[0] != out2.shape[0]:
                         continue
@@ -180,7 +175,7 @@ def main():
                             mask2 = torch.zeros_like(train_mask_orig, dtype=torch.bool)
                             mask2[selected_indices] = True
 
-                            out1 = out1_orig[mask1]  # [k:k + batch_size, :]
+                            out1 = out1_orig[mask1]
                             out2 = out2_orig[mask2]
                             if out1.shape[0] != out2.shape[0]:
                                 continue
@@ -212,8 +207,7 @@ def main():
             exit(-1)
         ct = datetime.datetime.now()
         experiment_accumulated_seconds += time.time() - start_time
-        #print(pre_acc)
-        #print(post_acc)
+
         print('Current time:', ct.strftime("%d/%m/%Y, %H:%M:%S"),
               'Completed:', (r + 1) / experiment_runs * 100, '%',
               'Duration per experiment:', round(time.time() - start_time, 2), 's',

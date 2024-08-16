@@ -3,15 +3,12 @@ import traceback
 import torch.nn
 
 from app.graph.gin_tu_quantization import *
-#from ogb.graphproppred import PygGraphPropPredDataset as ogb_datasets
-#from torch_geometric.data import DataLoader as GMDataLoader
 from pyq.fia.bfa.attack_gin_tu_dataset.RBFA import RandomBFA as RBFA
 from pyq.fia.bfa.attack_gin_tu_dataset.PBFA import ProgressiveBFA as PBFA
 from pyq.fia.bfa.attack_gin_tu_dataset.IBFA import InjectivityBFA as IBFA
 import datetime
 import time
 import random
-#from ogb.graphproppred import Evaluator
 
 from pyq.fia.bfa.utils import _WrappedGraphDataset, eval_ogbg, get_n_params
 
@@ -69,8 +66,6 @@ def validate(model, test_loader):
         for data in test_loader:
             data = data.to(device)
             x = torch.rand(data.num_nodes, 3).to(device)
-            #print(torch_geometric.utils.degree(data.edge_index.flatten()).shape)
-            #x = torch_geometric.utils.degree(data.edge_index[0]).view(-1, 1)
             outputs = model(x , data.edge_index, data.batch)
             predicted = outputs.argmax(dim=-1)#torch.max(outputs.data, 1)
             total += data.y.size(0)
@@ -98,23 +93,16 @@ def main():
     if not 'IBFA' in attack_type:
         ibfa_lim = 1.0
 
-    #attack_type, dataset_name, device = 'RBFA', 'ogbg-molpcba', torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    #experiment_runs, eval_runs, attack_runs, batch_size = 10, 10, 10, 256
     pre_metric, post_metric, bit_flips = [], [], []
 
     print('Start time', datetime.datetime.now().strftime("%d/%m/%Y, %H:%M:%S"))
     experiment_accumulated_seconds = 0
     failure_counter = 0
-    train_loader, test_loader = setup_data(dataset_name, batch_size, True, ibfa_lim) #shuffled every epoch -> should be False
-
+    train_loader, test_loader = setup_data(dataset_name, batch_size, True, ibfa_lim) 
     for r in range(experiment_runs):
         start_time = time.time()
         net = setup_net(dataset_name).to(device)#copy.deepcopy(net_clean).to(device)
-        #net.eval()
-        #print(eval_ogbg(net, device, test_loader, evaluator), flush=True)
-        #print(eval_ogbg(net, device, test_loader, evaluator), flush=True)
-        #print(eval_ogbg(net, device, test_loader, evaluator), flush=True)
-        #exit(-1)
+
         BFA, criterion = setup_attack(attack_type, dataset_name)
         print('params', get_n_params(net))
         data, target = None, None
@@ -128,18 +116,16 @@ def main():
                         data = data.to(device)
                         target = data.y
                         break
-        #print(target)
-        #exit(1)
+
         if attack_type == 'RBFA':
             pass
         if attack_type == 'IBFAv1':
             with torch.no_grad():
                 max_loss = float('-inf')
-                d = train_loader#d = [x for x in train_loader]
+                d = train_loader
                 for i, data1 in enumerate(d):
                     for j, data2 in enumerate(d):
-                        #print(data1.size(), data2.size(), flush=True)
-                        #if data1.size() == data2.size() and i != j:
+
                         data1 = data1.to(device)
                         data2 = data2.to(device)
 
@@ -147,28 +133,24 @@ def main():
                         is_labeled1, is_labeled2 = data1.y == data1.y, data2.y == data2.y # Not all data always labeled.
                         out1, out2 = net(x1, data1.edge_index, data1.batch)[is_labeled1], net(x2, data2.edge_index, data2.batch)[is_labeled2]
                         cut = min(out1.shape[0], out2.shape[0])
-                        #print(out1, out2)
+
                         loss = criterion(out1[:cut], out2[:cut])
-                        #print(loss, flush=True)
+
                         if max_loss < loss:
                             print(i, loss)
                             max_loss = loss
                             max_data1 = data1
                             max_data2 = data2
-                        #break
-                        #break
-                    #if i > 10:
-                    #    break
+
             print(max_data1.size(), max_data2.size(), flush=True)
             print('IBFAv1 data found', flush=True)
             data = max_data1
             target = max_data2
 
         net = net.to(device)
-        #net.train()
-        #train_perf = eval_ogbg(net, device, train_loader, evaluator)
+
         test_perf = validate(net, test_loader)
-        #print(test_perf)
+
         pre_metric.append(test_perf)
         attacker, attack_log = BFA(criterion, net, 25, True), None
 
@@ -196,10 +178,10 @@ def main():
                         max_loss = float('-inf')
                         for i, data1 in enumerate(train_loader):
                             for j, data2 in enumerate(train_loader):
-                                #if data1.size() == data2.size() and i != j:
+
                                 data1 = data1.to(device)
                                 data2 = data2.to(device)
-                                #break
+
                                 x1, x2 = torch.rand(data1.num_nodes, 3).to(device), torch.rand(data2.num_nodes,
                                                                                                3).to(device)
                                 is_labeled1, is_labeled2 = data1.y == data1.y, data2.y == data2.y  # Not all data always labeled.
@@ -213,8 +195,7 @@ def main():
                                     max_loss = loss
                                     max_data1 = data1
                                     max_data2 = data2
-                                #break
-                            #break
+
                             if i > 5:
                                 break
                     attack_log = attacker.run_attack(net, max_data1.to(device), max_data2.to(device), attack_runs)
@@ -231,11 +212,11 @@ def main():
                         break
             if attack_log is None:
                 raise Exception('No attack solution found')
-            #if len(attack_log) > 0:
+
             bit_flips.append(flips)
-            #train_perf = eval_ogbg(net, device, train_loader, evaluator)
+
             test_perf = validate(net, test_loader)
-            #print(test_perf.values())
+
             post_metric.append(test_perf)
         except Exception as e:
             failure_counter+=1
@@ -244,7 +225,7 @@ def main():
         ct = datetime.datetime.now()
         experiment_accumulated_seconds += time.time() - start_time
 
-        #print(layers)
+
         print('Current time:', ct.strftime("%d/%m/%Y, %H:%M:%S"),
               'Completed:', (r + 1) / experiment_runs * 100, '%',
               'Duration per experiment:', round(time.time() - start_time, 2), 's',

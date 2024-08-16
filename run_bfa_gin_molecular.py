@@ -18,9 +18,6 @@ from pyq.fia.bfa.utils import _WrappedGraphDataset, eval_ogbg, get_n_params
 
 import argparse #new
 import copy
-# import json
-
-#from pyq.pyq.core.quantization.wrapper import TransformationLayerQuantizerWrapper
 
 
 def setup_data(dataset_name, batch_size, shuffle=True):
@@ -69,9 +66,9 @@ def setup_attack(attack_type, dataset):
             criterion = torch.nn.KLDivLoss()
         if dataset in ['ogbg-moltox21', 'ogbg-moltoxcast', 'ogbg-molsider', 'ogbg-molclintox', 'ogbg-molmuv']:
             criterion = torch.nn.KLDivLoss(log_target=True)
-        #L1 doesnt work well for molpcba
+
         if dataset in ['ogbg-molhiv', 'ogbg-molbace', 'ogbg-molbbbp']:
-            criterion = torch.nn.L1Loss()# L1 works better for molhiv than KLDDiv
+            criterion = torch.nn.L1Loss()
     return BFA, criterion
 
 import torch.nn.functional as F
@@ -90,19 +87,17 @@ def main():
     attack_type, dataset_name, device = args.type, args.data, torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     experiment_runs, eval_runs, attack_runs, batch_size = args.n, 10, args.k, args.sz
 
-    #attack_type, dataset_name, device = 'RBFA', 'ogbg-molpcba', torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    #experiment_runs, eval_runs, attack_runs, batch_size = 10, 10, 10, 256
     pre_metric, post_metric, bit_flips = [], [], []
 
     print('Start time', datetime.datetime.now().strftime("%d/%m/%Y, %H:%M:%S"))
     experiment_accumulated_seconds = 0
     failure_counter = 0
-    train_loader, test_loader = setup_data(dataset_name, batch_size, True) #shuffled every epoch -> should be False
+    train_loader, test_loader = setup_data(dataset_name, batch_size, True)
     evaluator = Evaluator(dataset_name)
 
     for r in range(experiment_runs):
         start_time = time.time()
-        net = setup_net(dataset_name).to(device)#copy.deepcopy(net_clean).to(device)
+        net = setup_net(dataset_name).to(device)
         #net.eval()
         BFA, criterion = setup_attack(attack_type, dataset_name)
         print('params', get_n_params(net))
@@ -121,10 +116,9 @@ def main():
         if attack_type == 'IBFAv1':
             with torch.no_grad():
                 max_loss = 0
-                d = train_loader#d = [x for x in train_loader]
+                d = train_loader
                 for i, data1 in enumerate(d):
                     for j, data2 in enumerate(d):
-                        #print(data1.size(), data2.size(), flush=True)
                         if True: #data1.size() == data2.size() and i != j:
                             data1 = data1.to(device)
                             data2 = data2.to(device)
@@ -132,11 +126,8 @@ def main():
                             is_labeled1, is_labeled2 = data1.y == data1.y, data2.y == data2.y # Not all data always labeled.
                             out1, out2 = net(data1)[is_labeled1], net(data2)[is_labeled2]
                             cut = min(out1.shape[0], out2.shape[0])
-                            #print(out1, out2)
                             loss = criterion(out1[:cut], out2[:cut])
-                            #print(loss, flush=True)
                             if max_loss < loss:
-                                #print(i, loss)
                                 max_loss = loss
                                 max_data1 = data1
                                 max_data2 = data2
@@ -150,9 +141,6 @@ def main():
         net = net.to(device)
 
         test_perf = eval_ogbg(net, device, test_loader, evaluator)
-        #statsdict_pre = copy.deepcopy(statsdict)
-        #for handle in handles: handle.remove()
-        #print(statsdict)
         pre_metric.append(list(test_perf.values())[0])
         attacker, attack_log = BFA(criterion, net, 100, True), None
 
@@ -190,31 +178,19 @@ def main():
                             if i > 10:
                                 break
                     attack_log = attacker.run_attack(net, max_data1.to(device), max_data2.to(device), max_flips=args.k)
-                    #name = attack_log[0][2]
                     if len(attack_log) > 0:
                         flips = attack_log[-1][1]
                     else:
                         break
             if attack_log is None:
                 raise Exception('No attack solution found')
-            # bit_flips.append(attack_log[-1][1])
+
             bit_flips.append(flips)
-            #train_perf = eval_ogbg(net, device, train_loader, evaluator)
+
             d = [0]
-            #statsdict = {}
-            #hook_all_layers(net, d, collect_stats, True)
+
             test_perf = eval_ogbg(net, device, test_loader, evaluator)
-            #intra_sim, inter_sim = [],[]
-            #for key in statsdict:
-            #    if 'inter' in key:
-            #        inter_sim.append(np.array(np.array(statsdict[key]).mean()/statsdict_pre[key]).mean())
-            #    if 'intra' in key:
-            #        intra_sim.append(np.array(statsdict[key]).mean()/np.array(statsdict_pre[key]).mean())
-            #    #print(np.array(statsdict[key]).mean(), np.array(statsdict_pre[key]).mean())
-            #    #print(key, np.array(statsdict_pre[key]).mean(), np.array(statsdict[key]).mean())
-            #print('inter', np.array(inter_sim).mean(), 'inter', np.array(intra_sim).mean())
-            #for handle in handles: handle.remove()
-            #print(test_perf.values())
+
             post_metric.append(list(test_perf.values())[0])
         except Exception as e:
             failure_counter+=1
