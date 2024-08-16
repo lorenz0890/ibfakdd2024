@@ -131,7 +131,6 @@ def train(model, device, loader, optimizer, task_type):
         else:
             pred = model(batch)
             optimizer.zero_grad()
-            #print(batch, flush=True)
             # ignore nan targets (unlabeled) when computing training loss.
             if "classification" in task_type:
                 loss = cls_criterion(pred, batch.y)
@@ -144,13 +143,9 @@ def eval(model, device, loader):
     model.eval()
     acc, ctr = 0, 0
     for batch in loader:
-        # print(batch, batch.num_graphs)
         ctr += 1
         pred = model(batch.to(device)).argmax(dim=1)
-        # print(pred, '\n', batch.y)
-        # break
         correct = (pred == batch.y).sum()
-        # print(int(correct) / int(batch.y.shape[0]))
         acc += int(correct) / int(batch.y.shape[0])
     model.train()
     return acc/ctr
@@ -164,10 +159,10 @@ def main():
     num_layer = 5
     emb_dim = 300
     drop_ratio = 0.5
-    epochs = 10
+    epochs = 30
     num_workers = 12
     feature = "full"
-    filename = "pyq_model_gin_graph_int16.pth" #TODO try again with new file name
+    filename = "pyq_model_gin_graph_int16.pth"
 
     device = torch.device("cuda:" + str(device)) if torch.cuda.is_available() else torch.device("cpu")
 
@@ -176,13 +171,9 @@ def main():
 
     split_idx = dataset.get_idx_split()
 
-    # automatic evaluator. takes dataset name as input
-    #evaluator = Evaluator(dataset_name)
 
     train_loader = DataLoader(dataset[split_idx["train"]], batch_size=batch_size, shuffle=True, num_workers=num_workers, pin_memory=True)
-    #valid_loader = DataLoader(
-    #    dataset[split_idx["valid"]], batch_size=batch_size, shuffle=False, num_workers=num_workers
-    #)
+
     test_loader = DataLoader(dataset[split_idx["test"]], batch_size=batch_size, shuffle=False, num_workers=num_workers, pin_memory=True)
 
     model = GNN(d=4, M=1, C=10#C=20
