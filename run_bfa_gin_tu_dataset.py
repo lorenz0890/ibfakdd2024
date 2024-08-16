@@ -51,7 +51,7 @@ def setup_attack(attack_type, dataset):
     if attack_type in ['IBFAv1', 'IBFAv2']:
         BFA = IBFA
         if dataset in ['tu-gitstar']:
-            criterion = torch.nn.L1Loss()# L1 works better for molhiv than KLDDiv
+            criterion = torch.nn.L1Loss()
         if dataset in ['tu-collab']:
              criterion = torch.nn.KLDivLoss(log_target=True)
     return BFA, criterion
